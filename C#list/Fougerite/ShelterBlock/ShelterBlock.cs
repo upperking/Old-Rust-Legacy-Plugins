@@ -23,7 +23,7 @@ namespace ShelterBlock
         }
         public void OnEntityDeployed(Fougerite.Player pl, Fougerite.Entity e, Fougerite.Player actualplacer)
         {
-            if (!e.Name.ToLower().Contains("Wood shelter"))
+            if (e.Name.ToLower().Contains("Wood shelter"))
             {
                 e.Destroy();
                 {
