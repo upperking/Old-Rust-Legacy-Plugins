@@ -23,7 +23,7 @@ namespace JoinLocations
 
         Server joinlocations = Server.GetServer();
 
-        public string JoinMessage = "{0} [color #9932cc]has joined the server [color #a2cd5a]uberrust official [color silver] ({1})";
+        public string JoinMessage = "{0} has joined the server uberrust official  {1}";
         public string FailMessage = "{0} has joined the server";
         public string API = "http://ip-api.com/json/";
 
