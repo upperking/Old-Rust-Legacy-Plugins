@@ -23,11 +23,18 @@ namespace JoinLocations
 
         Server joinlocations = Server.GetServer();
 
-        public string JoinMessage = "{0} has joined the server {1}";
+        public string JoinMessage = "{0} [color #9932cc]has joined the server [color #a2cd5a]uberrust official [color silver] ({1})";
         public string FailMessage = "{0} has joined the server";
         public string API = "http://ip-api.com/json/";
+
         string land = string.Empty;
 
+        public override string Name { get { return "JoinLocations"; } }
+        public override string Author { get { return "ice cold"; } }
+        public override string Description { get { return "Shows from which county people join from"; } }
+        public override Version Version { get { return new Version("1.0"); } }
+
+        // With this on true wil the plugin using threading while searching for the country
         public bool Smoothmode = false;
 
         public override void Initialize()
@@ -69,6 +76,7 @@ namespace JoinLocations
                 GetCounty(netuser);
             }
         }
+        // SmoothMode wil do it without lag or server freez......    this is handy for localhost, laggy, or big servers   but if you have an host like me then you dont need smoothmode :)
         void SmoothMode(Fougerite.Player netuser)
         {
             new Thread(() => 
