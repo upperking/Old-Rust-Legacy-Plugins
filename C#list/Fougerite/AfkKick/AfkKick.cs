@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +39,7 @@ namespace AfkKick
             }
             catch (Exception)
             {
-                Logger.LogWarning("[AfkKick] AfkKick.cfg is corrupted or not found");
+                Logger.LogWarning("[AfkKick] AfkKick.ini is corrupted or not found");
             }
             Fougerite.Hooks.OnPlayerSpawned += Spawn;
         }
