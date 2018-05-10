@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +19,7 @@ namespace AdvGod
         public override string Name { get { return "AdvGod"; } }
         public override string Author { get { return "ice cold"; } }
         public override string Description { get { return "Allow admins to give god to other players and also admins can give god to themselves"; } }
-        public override Version Version { get { return new Version("1.0"); } }
+        public override Version Version { get { return new Version("1.1"); } }
 
         #region Initialize
         public override void Initialize()
@@ -53,9 +53,11 @@ namespace AdvGod
                 if (netuser.Admin)
                 {
                     netuser.Notice("☤", "AdvGod by ice cold", 15f);
-                    netuser.MessageFrom(Name, yellow + "/godon >= Turn god on/off");
+                    netuser.MessageFrom(Name, yellow + "/godon >= Turn god on");
+                    netuser.MessageFrom(Name, yellow + "/godoff >= Turn god off");
                     netuser.MessageFrom(Name, yellow + "/givegod <Name> >= Gives god to specific player");
                     netuser.MessageFrom(Name, yellow + "/remgod <Name> >= Remove god from specific player");
+                    netuser.MessageFrom(Name, green + "Check all my public work on " + yellow + " https://github.com/icecolderino");
                 }
                 else
                 {
@@ -65,12 +67,12 @@ namespace AdvGod
             else if (cmd == "godon")
             {
                 if (netuser.Admin)
-                {
+                {                 
                     if (!DataStore.GetInstance().ContainsKey("AdvgodOn", netuser.SteamID))
-                    {
+                    {                    
                         var id = netuser.SteamID;
                         netuser.MessageFrom(Name, green + "Godmode enabled");
-                        Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + "Is now now in godmode");
+                        Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + " Is now now in godmode");
                         netuser.Notice("☤", "Godmode enabled");
                         DataStore.GetInstance().Add("AdvgodOn", id, "on");
                         string line = DateTime.Now + " " + netuser.Name + ": Has used the /godon command";
@@ -80,21 +82,29 @@ namespace AdvGod
                     }
                     else
                     {
-                        var id = netuser.SteamID;
-                        netuser.MessageFrom(Name, "Godmode disabled");
-                        Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + "Has disabled godmode");
-                        netuser.Notice("☤", "Godmode disabled");
-                        DataStore.GetInstance().Remove("AdvgodOn", id);
-                        string line = DateTime.Now + " " + netuser.Name + ": Has used the /godon command";
-                        file = new System.IO.StreamWriter(ppath, true);
-                        file.WriteLine(line);
-                        file.Close();
+                        netuser.MessageFrom(Name, yellow + "You already have godmode enabled type /godoff to disable it");
                     }
                 }
                 else
                 {
                     netuser.MessageFrom(Name, red + "You dont have permissions to use /godon");
                 }
+            }
+            else if(cmd == "godoff")
+            {
+                if(!netuser.Admin) { netuser.MessageFrom(Name, red + "You dont have permissions to use /godoff"); return; }
+                if(DataStore.GetInstance().ContainsKey("AdvgodOn", netuser.SteamID))
+                {
+                    var id = netuser.SteamID;
+                    netuser.MessageFrom(Name, "Godmode disabled");
+                    Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + "Has disabled godmode");
+                    netuser.Notice("☤", "Godmode disabled");
+                    DataStore.GetInstance().Remove("AdvgodOn", id);
+                    string line = DateTime.Now + " " + netuser.Name + ": Has used the /godon command";
+                    file = new System.IO.StreamWriter(ppath, true);
+                    file.WriteLine(line);
+                    file.Close();
+                }           
             }
             else if (cmd == "givegod")
             {
@@ -204,7 +214,7 @@ namespace AdvGod
             }
             else
             {
-                Logger.LogWarning("Attacker was null while entity hurt or damage was decay");
+                //Logger.LogWarning("Attacker was null while entity hurt or damage was decay");
             }
         }
     }
