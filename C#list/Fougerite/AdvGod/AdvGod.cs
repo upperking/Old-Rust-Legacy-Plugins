@@ -22,7 +22,7 @@ namespace AdvGod
         public override string Name { get { return "AdvGod"; } }
         public override string Author { get { return "ice cold"; } }
         public override string Description { get { return "Allow admins to give god to other players and also admins can give god to themselves"; } }
-        public override Version Version { get { return new Version("1.1"); } }
+        public override Version Version { get { return new Version("1.2"); } }
 
         #region Initialize
         public override void Initialize()
@@ -55,7 +55,7 @@ namespace AdvGod
         {
             if (cmd == "god")
             {
-                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
+                if (netuser.Admin || Hasflag(netuser, ADVGOD_FLAG))
                 {
                     netuser.Notice("☤", "AdvGod by ice cold", 15f);
                     netuser.MessageFrom(Name, yellow + "/godon >= Turn god on");
@@ -71,7 +71,7 @@ namespace AdvGod
             }
             else if (cmd == "godon")
             {
-                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
+                if (netuser.Admin || Hasflag(netuser, ADVGOD_FLAG))
                 {                 
                     if (!DataStore.GetInstance().ContainsKey("AdvgodOn", netuser.SteamID))
                     {                    
@@ -102,7 +102,7 @@ namespace AdvGod
                 {
                     var id = netuser.SteamID;
                     netuser.MessageFrom(Name, "Godmode disabled");
-                    Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + "Has disabled godmode");
+                    Server.GetServer().BroadcastFrom(Name, green + netuser.Name + yellow + " Has disabled godmode");
                     netuser.Notice("☤", "Godmode disabled");
                     DataStore.GetInstance().Remove("AdvgodOn", id);
                     string line = DateTime.Now + " " + netuser.Name + ": Has used the /godon command";
@@ -113,7 +113,7 @@ namespace AdvGod
             }
             else if (cmd == "givegod")
             {
-                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
+                if (netuser.Admin || Hasflag(netuser, ADVGOD_FLAG))
                 {
                     string s = string.Join(" ", args);
                     Fougerite.Player p = Fougerite.Server.GetServer().FindPlayer(s);
@@ -147,7 +147,7 @@ namespace AdvGod
             }
             else if (cmd == "remgod")
             {
-                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
+                if (netuser.Admin || Hasflag(netuser, ADVGOD_FLAG))
                 {
                     string s = string.Join(" ", args);
                     Fougerite.Player p = Fougerite.Server.GetServer().FindPlayer(s);
