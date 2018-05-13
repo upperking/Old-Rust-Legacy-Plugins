@@ -10,9 +10,12 @@ namespace AdvGod
 {
     public class AdvGod : Fougerite.Module
     {
+        public IniParser flags;
+
         private string green = "[color #82FA58]";
         private string yellow = "[color #F4FA58]";
         private string red = "[color #FF0000]";
+        public string ADVGOD_FLAG = "advgod.use";
         public static string ppath;
         public static System.IO.StreamWriter file;
         public string pathfile = Directory.GetCurrentDirectory() + "\\save\\AdvGod\\Commands.log";
@@ -24,6 +27,8 @@ namespace AdvGod
         #region Initialize
         public override void Initialize()
         {
+            flags = new IniParser(Directory.GetCurrentDirectory() + "\\save\\FlagsAPI\\PlayerFlagdb.ini");
+
             if (!File.Exists(Path.Combine(ModuleFolder, "Commands.log"))) { File.Create(Path.Combine(ModuleFolder, "Commands.log")).Dispose(); }
             {
                 ppath = Path.Combine(ModuleFolder, "Commands.log");
@@ -50,7 +55,7 @@ namespace AdvGod
         {
             if (cmd == "god")
             {
-                if (netuser.Admin)
+                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
                 {
                     netuser.Notice("☤", "AdvGod by ice cold", 15f);
                     netuser.MessageFrom(Name, yellow + "/godon >= Turn god on");
@@ -66,7 +71,7 @@ namespace AdvGod
             }
             else if (cmd == "godon")
             {
-                if (netuser.Admin)
+                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
                 {                 
                     if (!DataStore.GetInstance().ContainsKey("AdvgodOn", netuser.SteamID))
                     {                    
@@ -92,7 +97,7 @@ namespace AdvGod
             }
             else if(cmd == "godoff")
             {
-                if(!netuser.Admin) { netuser.MessageFrom(Name, red + "You dont have permissions to use /godoff"); return; }
+                if(!netuser.Admin || !Hasflag(netuser, ADVGOD_FLAG)) { netuser.MessageFrom(Name, red + "The flag > " + ADVGOD_FLAG + " < is required for this command"); return; }
                 if(DataStore.GetInstance().ContainsKey("AdvgodOn", netuser.SteamID))
                 {
                     var id = netuser.SteamID;
@@ -108,7 +113,7 @@ namespace AdvGod
             }
             else if (cmd == "givegod")
             {
-                if (netuser.Admin)
+                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
                 {
                     string s = string.Join(" ", args);
                     Fougerite.Player p = Fougerite.Server.GetServer().FindPlayer(s);
@@ -142,7 +147,7 @@ namespace AdvGod
             }
             else if (cmd == "remgod")
             {
-                if (netuser.Admin)
+                if (netuser.Admin && Hasflag(netuser, ADVGOD_FLAG))
                 {
                     string s = string.Join(" ", args);
                     Fougerite.Player p = Fougerite.Server.GetServer().FindPlayer(s);
@@ -216,6 +221,15 @@ namespace AdvGod
             {
                 //Logger.LogWarning("Attacker was null while entity hurt or damage was decay");
             }
+        }
+        bool Hasflag(Fougerite.Player pl, string flag)
+        {
+            var id = pl.SteamID;
+            if (flags.ContainsSetting(id, flag))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
