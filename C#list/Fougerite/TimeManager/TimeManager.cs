@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -93,6 +93,10 @@ namespace TimeManager
                         ini.SetSetting("Config", "DayLenght", args[0]);
                         ini.Save();
                     }
+                    else
+                    {
+                        pl.MessageFrom(Name, "Oops make sure that the value is a number");
+                    }
                 }
             }
             else if (cmd == "nightlenght")
@@ -112,6 +116,10 @@ namespace TimeManager
                         env.nightlength = value;
                         ini.SetSetting("Config", "NightLenght", args[0]);
                         ini.Save();
+                    }
+                    else
+                    {
+                        pl.MessageFrom(Name, "Oops make sure that the value is a number");
                     }
                 }
             }
