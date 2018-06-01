@@ -46,6 +46,16 @@ namespace TimeManager
                         pl.MessageFrom(Name, "/nightlenght number - changes nightlenght to number");
                         return;
                     }
+                    int value = Convert.ToInt32(args[0]);
+                    if(int.TryParse(args[0], out value))
+                    {
+                        World.GetWorld().Time = value;
+                        Server.GetServer().BroadcastFrom(Name, "The server time has been changed to " + value);
+                    }
+                    else
+                    {
+                        pl.MessageFrom(Name, "Oops make sure that the value is a number");
+                    }
                 }
             }
             else if (cmd == "freezetime")
