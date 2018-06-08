@@ -131,6 +131,11 @@ namespace F_Essentials
 
         public List<Player> tprreq = new List<Player>();
         public List<ulong> remove = new List<ulong>();
+        public List<ulong> warpcd = new List<ulong>();
+
+        public Dictionary<ulong, Vector3> homemovecheck = new Dictionary<ulong, Vector3> { };
+        public Dictionary<ulong, Vector3> warpmovecheck = new Dictionary<ulong, Vector3> { };
+        public Dictionary<ulong, Vector3> tprmovecheck = new Dictionary<ulong, Vector3> { };
 
         public System.Random rnd;
         string cou = string.Empty;
@@ -228,7 +233,7 @@ namespace F_Essentials
             {
                 foreach (var pl in Server.GetServer().Players)
                 {
-                    if (Server.GetServer().Players.Count >= MinPlayers)
+                    if (pl.IsOnline)
                     {
                         double range = Math.Round(Math.Ceiling(Vector3.Distance(vec, pl.Location)));
                         string message = AirdropIncommingMessage.Replace("{dist}", range.ToString());
@@ -302,8 +307,111 @@ namespace F_Essentials
                 if(pl.Admin)
                 {
                     pl.Message("/warp_set Name");
-
+                    pl.Message("/warp_remove Name");
                 }
+            }
+            else if(cmd == "warp")
+            {
+                if(args.Length != 1) { pl.Message("Usage /warp name"); return; }
+                if(Warps.ContainsSetting("Warps", args[0]))
+                {
+                    if (pl.Admin)
+                    {
+                        Vector3 loc = Util.GetUtil().ConvertStringToVector3(Warps.GetSetting("Warps", args[0]));
+                        pl.TeleportTo(loc);
+                        pl.Message("[color#00bfff]Warped to " + args[0]);
+                    }
+                    else
+                    {
+                        if(!warpcd.Contains(pl.UID))
+                        {
+                            var dict = new Dictionary<string, object>();
+                            dict["pl"] = pl;
+                            warpcd.Add(pl.UID);
+                            Warpcooldown(WarpCooldown * 1000, dict).Start();
+                            Warpdelaytimer(WarpDelay * 1000, dict).Start();
+                            string message = WarpDelayMessage.Replace("{warpname}", args[0]);
+                        }
+                        else
+                        {
+                            pl.Message(WarpCooldownMessage);
+                        }
+                    }
+                }             
+            }
+            else if(cmd == "warps")
+            {
+                pl.Message("WarpsList");
+                string[] l = Warps.EnumSection("Warps");
+                foreach(var num in l)
+                {
+                    pl.Message(num);
+                }
+            }
+            else if(cmd == "warp_set")
+            {
+                if(pl.Admin)
+                {
+                    if(args.Length != 1) { pl.Message("Usage /warp_set Name"); return; }
+                    if(Warps.ContainsSetting("Warps", args[0])) { pl.Message("There is already a warp with the name " + args[0]); return; }
+                    Warps.AddSetting("Warps", args[0], pl.Location.ToString());
+                    Warps.Save();
+                    pl.Message("Warp saved");
+                }
+            }
+            else if(cmd == "warp_remove")
+            {
+                if(pl.Admin)
+                {
+                    if(args.Length != 1) { pl.Message("Usage /warp_remove Name"); return; }
+                    if(!Warps.ContainsSetting("Warps", args[0])) { pl.Message("There is no warp with the name " + args[0]); return; }
+                    Warps.DeleteSetting("Warps", args[0]);
+                    Warps.Save();
+                    pl.Message("The warp " + args[0] + " has been succesfully removed");
+                }
+            }
+            else if(cmd == "help")
+            {
+                if(EnableHelp)
+                {
+                    foreach (var h in HelpList.EnumSection("Help"))
+                    {
+                        string d = HelpList.GetSetting("Help", h);
+                        pl.MessageFrom("Help", d);
+                    }
+                }
+                
+            }
+            else if(cmd == "rules")
+            {
+                if(EnableRules)
+                {
+                    foreach (var r in RulesList.EnumSection("Rules"))
+                    {
+                        string d = RulesList.GetSetting("Help", r);
+                        pl.MessageFrom("Help", d);
+                    }
+                }          
+            }
+            else if(cmd == "info")
+            {
+                pl.MessageFrom(Name, "[color #87cefa][Fougerite-Essentials " + Version + " plugin brought by ice cold");
+                pl.MessageFrom(Name, "[color #20b2aa]Wanna support ice cold? https://www.patreon.com/uberrust");
+                pl.MessageFrom(Name, "[color #8470ff]You can download this plugin at ");
+            }
+            else if(cmd == "friendhelp")
+            {
+                pl.Message("[Fougerite-Essentials] Friends system brought by ice cold");
+                pl.Message("/addfriend Name - ads player to your friends list");
+                pl.Message("/unfriend Name - Unfriend someone");
+                pl.Message("/friends - See all your friends");
+            }
+            else if(cmd == "sharehelp")
+            {
+                pl.Message("[Fougerite-Essentials] Share system brought by ice cold");
+                pl.Message("/share Name - Door/structure share the player");
+                pl.Message("/unshare Name - unshare someone");
+                pl.Message("/sharelist - See all the people you have shared");
             }
         }
         public void FindCountry(Player pl)
