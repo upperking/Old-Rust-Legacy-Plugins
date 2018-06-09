@@ -9,6 +9,8 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net;
 
+using User = Fougerite.Player;
+
 namespace F_Essentials
 {
     public class EssentialsModule : Module
@@ -143,7 +145,16 @@ namespace F_Essentials
 
         public System.Random rnd;
         string cou = string.Empty;
-     
+
+        RaycastHit cachedRaycast;
+        Character cachedCharacter;
+        bool cachedBoolean;
+        Collider cachedCollider;
+        StructureComponent cachedStructure;
+        DeployableObject cachedDeployable;
+        StructureMaster cachedMaster;
+        Facepunch.MeshBatch.MeshBatchInstance cachedhitInstance;
+
         public override void Initialize()
         {
             CheckConfig();
@@ -179,7 +190,7 @@ namespace F_Essentials
             Hooks.OnServerLoaded -= Loaded;
             Hooks.OnPluginInit -= Init;
         }
-        public void Spawned(Player pl, SpawnEvent se)
+        public void Spawned(User pl, SpawnEvent se)
         {
             if(EnableNewSpawns)
             {
@@ -192,7 +203,7 @@ namespace F_Essentials
                 }              
             }
         }
-        public void OnPlayerConnected(Player pl)
+        public void OnPlayerConnected(User pl)
         {
             PlayerDatabase.AddSetting(pl.SteamID, "ID", pl.SteamID);
             PlayerDatabase.AddSetting(pl.SteamID, "IP", pl.IP);
@@ -223,7 +234,7 @@ namespace F_Essentials
                 PlayerDatabase.Save();
             }                    
         }
-        public void OnPlayerDisconnected(Player pl)
+        public void OnPlayerDisconnected(User pl)
         {
             if (EnableLeaveMessages)
             {
@@ -246,7 +257,7 @@ namespace F_Essentials
                 }
             }                      
         }
-        public void Command(Player pl, string cmd, string[] args)
+        public void Command(User pl, string cmd, string[] args)
         {
             if(cmd == "esshelp")
             {
@@ -262,6 +273,7 @@ namespace F_Essentials
                 if(EnableWarps) { pl.Message("/warphelp - See all the help for the warping system"); }
                 if(pl.Admin || pl.Moderator)
                 {
+                    pl.Message("/prod - Shows the owner of the object you are looking at");
                     pl.Message("/country player - Shows from which country a player comes");
                     pl.Message("/download url filename - downloads that object and put it in the the Downloaded folder EXAMPLE: (/download http://myitem.com myitem.zip)");
                     pl.Message("/addnewspawn - adds a new spawns to the overwrite spawn list");
@@ -272,7 +284,7 @@ namespace F_Essentials
                 if(pl.Admin || pl.Moderator)
                 {
                     if(args.Length != 1) { pl.Message("Usage /country player"); return; }
-                    Player target = Server.GetServer().FindPlayer(args[0]);
+                    User target = Server.GetServer().FindPlayer(args[0]);
                     if(target == null) { pl.Message("Couldn't find the target user"); return; }
                     string country = PlayerDatabase.GetSetting(target.SteamID, "Country");
                     pl.Message("[color #ffb90f]" + target.Name  + " is located from [color #c1ffc1]" + country);
@@ -422,7 +434,7 @@ namespace F_Essentials
                 if(EnableFriendsSystem)
                 {
                     if (args.Length != 1) { pl.Message("Usage /addfriend Name"); return; }
-                    Player target = Server.GetServer().FindPlayer(args[0]);
+                    User target = Server.GetServer().FindPlayer(args[0]);
                     if (target == null) { pl.Message("Couldn't find the target user"); return; }
                     if (friends.ContainsSetting(pl.SteamID, target.SteamID)) { string message = AlreadyFriendedMessage.Replace("{friend}", target.Name); pl.Message(message); return; }
                     string me = AddFriendMessage.Replace("{friend}", target.Name);
@@ -437,7 +449,7 @@ namespace F_Essentials
                 if(EnableShareSystem)
                 {
                     if (args.Length != 1) { pl.Message("Usage /unfriend Name"); return; }
-                    Player target = Server.GetServer().FindPlayer(args[0]);
+                    User target = Server.GetServer().FindPlayer(args[0]);
                     if(target == null) { pl.Message("Couldn't find the target user"); return; }
                     if(!friends.ContainsSetting(pl.SteamID, target.SteamID)) { pl.Message(target.Name + " Isnt in your friends list"); return; }
                     friends.DeleteSetting(pl.SteamID, target.SteamID);
@@ -449,17 +461,101 @@ namespace F_Essentials
                 }
                
             }
+            else if(cmd == "friends")
+            {
+                if(EnableFriendsSystem)
+                {
+                    pl.Message("===FriendsList===");
+                    foreach (var id in friends.EnumSection(pl.SteamID))
+                    {
+                        string m = friends.GetSetting(pl.SteamID, id);
+                        pl.Message("_ " + m);
+                    }
+                }
+            }
             else if(cmd == "share")
             {
                 if(EnableShareSystem)
                 {
                     if(args.Length != 1) { pl.Message("Usage /share Name"); return; }
-                    Player target = Server.GetServer().FindPlayer(args[0]);
+                    User target = Server.GetServer().FindPlayer(args[0]);
+                    if (target == null) { pl.Message("Couldn't find the target user");  return; }
+                    if(share.ContainsSetting(pl.SteamID, target.SteamID)) { string message = AlreadySharedMessage.Replace("{player}", target.Name); pl.Message(message); return; }
+                    share.AddSetting(pl.SteamID, target.SteamID, target.Name);
+                    share.Save();
+                    string me = SharedMessage.Replace("{player}", target.Name);
+                    pl.Message(me);
+                }
+            }
+            else if(cmd == "unshare")
+            {
+                if(EnableShareSystem)
+                {
+                    if(args.Length != 1) { pl.Message("Usage /unshare Name"); return; }
+                    User target = Server.GetServer().FindPlayer(args[0]);
+                    if(target == null) { pl.Message("Couldn't find the target user"); return; }
+                    if(!share.ContainsSetting(pl.SteamID, target.SteamID)) { pl.Message("You are not sharing with " + target.Name); return; }
+                    share.DeleteSetting(pl.SteamID, target.SteamID);
+                    share.Save();
+                    string message = UnSharedMessage.Replace("{player}", target.Name);
+                    pl.Message(message);
+                }
+            }
+            else if(cmd == "sharelist")
+            {
+                if(EnableShareSystem)
+                {
+                    pl.Message("===ShareList===");
+                    foreach(var id in share.EnumSection(pl.SteamID))
+                    {
+                        string m = share.GetSetting(pl.SteamID, id);
+                        pl.Message("- " + m);
+                    }
+                }
+            }
+            else if(cmd == "prod")
+            {
+                if(pl.Admin || pl.Moderator)
+                {
+                    cachedCharacter = pl.PlayerClient.rootControllable.idMain.GetComponent<Character>();
+                    if (!MeshBatchPhysics.Raycast(cachedCharacter.eyesRay, out cachedRaycast, out cachedBoolean, out cachedhitInstance)) { pl.Message("He Hello thats the sky bro"); return; }
+
+                    if(cachedhitInstance != null)
+                    {
+                        cachedCollider = cachedhitInstance.physicalColliderReferenceOnly;
+                        if (cachedCollider == null) { pl.Message("Sorry but i cannot prod that"); return; }
+                        cachedStructure = cachedCollider.GetComponent<StructureComponent>();
+
+                        if (cachedStructure != null && cachedStructure._master != null)
+                        {
+                            cachedMaster = cachedStructure._master;
+                            var name = PlayerDatabase.GetSetting(cachedMaster.ownerID.ToString(), "Name");
+                            pl.Message(string.Format("{object} - {ID} - {name}", cachedStructure.gameObject.name, cachedMaster.ownerID.ToString(), name == null ? "Unknown" : name.ToString()));
+                        }
+                    }
+                    else
+                    {
+
+                        cachedDeployable = cachedRaycast.collider.GetComponent<DeployableObject>();
+
+                        if(cachedDeployable != null)
+                        {
+                            var name = PlayerDatabase.GetSetting(cachedMaster.ownerID.ToString(), "Name");
+                            pl.Message(string.Format("{object} - {ID} - {name}", cachedDeployable.gameObject.name, cachedDeployable.ownerID.ToString(), name == null ? cachedDeployable.ownerName.ToString() : name.ToString()));
+                        }
+                    }
+                    pl.Message("Failed to prod " + cachedRaycast.collider.gameObject.name);
+                }
+            }
+            else if(cmd == "home")
+            {
+                if(EnableHome)
+                {
 
                 }
             }
         }
-        public void FindCountry(Player pl)
+        public void FindCountry(User pl)
         {
             try
             {
