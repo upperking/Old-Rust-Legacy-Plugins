@@ -24,6 +24,7 @@ namespace F_Essentials
         public IniParser SpawnsOverwrite;
         public IniParser PlayerDatabase;
         public IniParser BodyParts;
+        public IniParser StructureHome;
 
         // config
 
@@ -136,12 +137,13 @@ namespace F_Essentials
         public List<Player> tprreq = new List<Player>();
         public List<ulong> remove = new List<ulong>();
         public List<ulong> warpcd = new List<ulong>();
-
-        public Dictionary<string, string> flist = new Dictionary<string, string> { };
+        public List<ulong> homecd = new List<ulong>();
+        public List<ulong> homemode = new List<ulong>();
 
         public Dictionary<ulong, Vector3> homemovecheck = new Dictionary<ulong, Vector3> { };
         public Dictionary<ulong, Vector3> warpmovecheck = new Dictionary<ulong, Vector3> { };
         public Dictionary<ulong, Vector3> tprmovecheck = new Dictionary<ulong, Vector3> { };
+        public Dictionary<ulong, string> homenum = new Dictionary<ulong, string> { };
 
         public System.Random rnd;
         string cou = string.Empty;
@@ -177,6 +179,7 @@ namespace F_Essentials
             SpawnsOverwrite = new IniParser(Path.Combine(ModuleFolder, "Spawns.list"));
             PlayerDatabase = new IniParser(Path.Combine(ModuleFolder, "PlayerDatabase.list"));
             BodyParts = new IniParser(Path.Combine(ModuleFolder, "BodyParts.list"));
+            StructureHome = new IniParser(Path.Combine(ModuleFolder, "StructureHomes.list"));
         }     
 
         public override void DeInitialize()
@@ -551,9 +554,82 @@ namespace F_Essentials
             {
                 if(EnableHome)
                 {
-
+                    if(args.Length != 1)
+                    {
+                        pl.Message("[Fougerite-Essentials] Home system brought by ice cold");
+                        if(!SleepingHome)
+                        {
+                            pl.Message("/home Name - teleports you the home");
+                            pl.Message("/sethome Name - Enabled sethome mode (hit a foundation or ceiling to save your home)");
+                            pl.Message("/delhome Name - Deletes that home");
+                            pl.Message("/homes - Shows the list of homes");
+                        }
+                        else
+                        {
+                            pl.Message("/homeon - Enables home mode (place a Sleepingbag or Bed to save that as your current home)");
+                            pl.Message("/gohome - Teleports you to your sleepingBag or Bed");
+                        }
+                    }
+                    else
+                    {
+                        if(!SleepingHome)
+                        {
+                            if(!homecd.Contains(pl.UID))
+                            {
+                                if (StructureHome.ContainsSetting(pl.SteamID, args[0]))
+                                {
+                                    var homeloc = StructureHome.GetSetting(pl.SteamID, args[0]);
+                                    var dict = new Dictionary<string, object>();
+                                    dict["pl"] = pl;
+                                    dict["homeloc"] = homeloc;
+                                    HomeTimer(HomeDelay * 1000, dict).Start();
+                                    string message = HomeDelayMessage.Replace("{home}", args[0]).Replace("{delay}", HomeDelay.ToString());
+                                    pl.Message(message);
+                                    HomeCooldown(HomeCooldown * 1000, dict).Start();
+                                    homecd.Add(pl.UID);
+                                }
+                                else
+                                {
+                                    string message = NoHomeMessage.Replace("{home}", args[0]);
+                                    pl.Message(message);
+                                }
+                            }
+                            else
+                            {
+                                string message = HomeCooldownMessage.Replace("{cooldown}", HomeCooldown.ToString());
+                                pl.Message(message);
+                            }
+                        }
+                    }
                 }
             }
+            else if(cmd == "sethome")
+            {
+                if(EnableHome)
+                {
+                    if(!homemode.Contains(pl.UID))
+                    {
+                        if (args.Length != 1) { pl.Message("Usage /sethome Name"); return; }
+                        string[] l = StructureHome.EnumSection(pl.SteamID);
+                        if ((Convert.ToBoolean(l.Length == MaxHomes)))
+                        {
+                            pl.Message(MaxHomesMessage);
+                        }
+                        else
+                        {
+                            homemode.Add(pl.UID);
+                            pl.Message("Sethome mode activated hit a foundation/ceiling to set your home");
+                            homenum.Add(pl.UID, args[0]);
+                        }
+                    }
+                    else
+                    {
+                        pl.Message("Please do /homestop first");
+                    }
+                  
+                }
+            }
+            else if(cmd == "")
         }
         public void FindCountry(User pl)
         {
