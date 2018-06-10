@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Translations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Translation Id="JoinMessage" Value="{Player} has joined from {Country}" />
-  <Translation Id="FailMessage" Value="{Player} has joined from Unknown" />
-</Translations>
