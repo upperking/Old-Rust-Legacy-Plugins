@@ -1,11 +1,9 @@
-﻿using Rocket.Core.Plugins;
+using Rocket.Core.Plugins;
 using Rocket.Unturned;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using System.Net;
-using System.Threading;
 using Newtonsoft.Json;
-using Rocket.API;
 
 using Rocket.API.Collections;
 using System.IO;
@@ -21,6 +19,8 @@ namespace JoinLocations
             JoinLocations.Instance = this;
             Configuration.Save();
             U.Events.OnPlayerConnected += Connected;
+            Rocket.Core.Logging.Logger.Log("JoinLocations by ice cold loaded");
+            
         }
         protected override void Unload()
         {
@@ -33,7 +33,8 @@ namespace JoinLocations
                 return new TranslationList()
                 {
                     {"JoinMessage", "{Player} has joined from {Country}" },
-                    {"FailMessage", "{Player} has joined from Unknown" }
+                    {"FailMessage", "{Player} has joined from Unknown" },
+                    {"ViewMessage", "{Player} is from {Country}" }
                 };
             }
         }
@@ -65,9 +66,7 @@ namespace JoinLocations
                 var message = JoinLocations.Instance.Translate("FailMessage");
                 string msg = message.Replace("{Player}", player.DisplayName);
                 UnturnedChat.Say(msg);
-            }
-           
-
+            }           
         }
     }
 }
