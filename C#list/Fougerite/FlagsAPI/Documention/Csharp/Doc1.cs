@@ -27,7 +27,7 @@ namespace TestFlags
         {
             if (cmd == "test")
             {
-                if (FlagsAPI.API.Hasflag(pl, "testflag"))
+                if (FlagsAPI.API.HasFlag(pl, "testflag"))
                 {
                    FlagsAPI.API.RegisterFlag("test2");              
                 }
@@ -38,7 +38,7 @@ namespace TestFlags
             }
             else if(cmd == "test2")
             {
-                if(FlagsAPI.API.Hasflag(pl, "testflag"))
+                if(FlagsAPI.API.HasFlag(pl, "testflag"))
                 {
                     FlagsAPI.API.RemoveFlag("test2");
                 }
