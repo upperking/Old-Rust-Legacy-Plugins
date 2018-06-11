@@ -8,7 +8,7 @@ namespace FlagsAPI
 {
     public class API
     {
-        public static bool Hasflag(Player pl, string flag)
+        public static bool HasFlag(Player pl, string flag)
         {
             if(pl.IsOnline)
             {
