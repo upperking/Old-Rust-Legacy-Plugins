@@ -1,13 +1,7 @@
-// ways to check flags
+// some example methods
+FlagsAPI.API.HasFlag(Player, "flagname")
+FlagsAPI.API.RemoveFlag(Player, "flagname");
+FlagsAPI.API.RegisterFlag("flagname");
+FlagsAPI.API.RemoveFlag("flagname");
+FlagsAPI.API.GetFlag(Player, "flagname");
 
-if(Hasflag(pl, "hereyourflagname"))
-
-if(pl.Admin || pl.Moderator|| Hasflag(pl, "hereyourflagname"))
-
-if(pl.Moderator || Hasflag(pl, "hereyourflagname"))
-
-if(pl.Admin && Hasflag(pl, "hereyourflagname"))
-
-if(pl.Admin || pl.Moderator && Hasflag(pl, "hereyourflagname"))
-
-if(pl.Moderator && Hasflag(pl, "hereyourflagname"))
