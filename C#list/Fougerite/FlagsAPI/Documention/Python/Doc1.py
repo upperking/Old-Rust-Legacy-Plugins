@@ -4,11 +4,9 @@ __version__ = '1.0'
 import clr
 clr.AddReferenceByPartialName("Fougerite")
 import Fougerite
-try:
-    clr.AddRefrenceByPartialName("FlagsAPI")
-    import FlagsAPI
-exept:
-    Util.Log("Failed to import FlagsAPI.dll")
+clr.AddRefrenceByPartialName("FlagsAPI")
+import FlagsAPI
+    
         
 class Example:
     def On_Command(self, Player, cmd, args):
