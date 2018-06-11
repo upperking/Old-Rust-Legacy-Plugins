@@ -53,7 +53,7 @@ namespace FlagsAPI
         {
             if (cmd == "flag")
             {
-                if (pl.Admin || API.Hasflag(pl, "canflag"))
+                if (pl.Admin || API.HasFlag(pl, "canflag"))
                 {
                     pl.Notice("⚑", "FlagsAPI brought by ice cold", 20f);
                     pl.MessageFrom(Name, "FlagsAPI 1.1 by ice cold");
@@ -68,7 +68,7 @@ namespace FlagsAPI
             }
             else if (cmd == "flag_add")
             {
-                if(pl.Admin || API.Hasflag(pl, "canflag"))
+                if(pl.Admin || API.HasFlag(pl, "canflag"))
                 {
                     if (args.Length != 2)
                     {
@@ -92,7 +92,7 @@ namespace FlagsAPI
             }
             else if (cmd == "flag_invoke")
             {
-                if(pl.Admin || API.Hasflag(pl, "canflag"))
+                if(pl.Admin || API.HasFlag(pl, "canflag"))
                 {
                     if (args.Length != 2)
                     {
@@ -115,7 +115,7 @@ namespace FlagsAPI
             }
             else if(cmd == "flags_reload")
             {
-                if(pl.Admin || API.Hasflag(pl, "canflag"))
+                if(pl.Admin || API.HasFlag(pl, "canflag"))
                 {
                     ini = new IniParser(Path.Combine(ModuleFolder, "PlayerFlagdb.ini"));
                     list = new IniParser(Path.Combine(ModuleFolder, "Flags.list"));
@@ -124,7 +124,7 @@ namespace FlagsAPI
             }
             else if(cmd == "flag_register")
             {
-                if(pl.Admin || API.Hasflag(pl, "canflag"))
+                if(pl.Admin || API.HasFlag(pl, "canflag"))
                 {
                     API.RegisterFlag(args[0]);
                     pl.MessageFrom(Name, "The flag (" + args[0] + ") was succestfully registered");
