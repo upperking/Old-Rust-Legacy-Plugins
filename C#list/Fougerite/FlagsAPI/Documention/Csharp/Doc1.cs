@@ -5,13 +5,10 @@ using System.Text;
 using System.IO;
 using Fougerite;
 
-namespace Doc1
+namespace TestFlags
 {
-    public class Doc1 : Fougerite.Module
+    public class Class1 : Fougerite.Module
     {
-        public IniParser flags;
-
-
         public override string Name { get { return "TestFlags"; } }
         public override string Author { get { return "ice cold"; } }
         public override string Description { get { return "testing"; } }
@@ -19,8 +16,6 @@ namespace Doc1
 
         public override void Initialize()
         {
-            flags = new IniParser(Directory.GetCurrentDirectory() + "\\save\\FlagsAPI\\PlayerFlagdb.ini");
-
             Fougerite.Hooks.OnCommand += Test;
         }
         public override void DeInitialize()
@@ -31,26 +26,27 @@ namespace Doc1
         {
             if (cmd == "test")
             {
-                if (Hasflag(pl, "testflag")) 
+                if (FlagsAPI.API.Hasflag(pl, "testflag"))
                 {
-                    //Further magic                   
+                   FlagsAPI.API.RegisterFlag("test2");              
                 }
                 else
                 {
                     pl.Message("The flag > testflag < is required for this command");
                 }
             }
-
-           
-        }
-        bool Hasflag(Fougerite.Player pl, string flag)
-        {
-            var id = pl.SteamID;
-            if (flags.ContainsSetting(id, flag))
+            else if(cmd == "test2")
             {
-                return true;
+                if(FlagsAPI.API.Hasflag(pl, "testflag"))
+                {
+                    FlagsAPI.API.RemoveFlag("test2");
+                }
             }
-            return false;
+            else if(cmd == "getflag")
+            {
+                Player target = Server.GetServer().FindPlayer(args[0]);
+                pl.MessageFrom(Name, target.Name + " has " + FlagsAPI.API.GetFlag(target, args[1]));
+            }
         }
     }
 }
