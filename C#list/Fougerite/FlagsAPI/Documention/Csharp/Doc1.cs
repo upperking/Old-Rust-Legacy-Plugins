@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Fougerite;
+using FlagsAPI;
 
 namespace TestFlags
 {
