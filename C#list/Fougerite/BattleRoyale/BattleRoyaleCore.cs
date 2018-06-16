@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,8 @@ namespace BattleRoyale
 
         DataStore ds = DataStore.GetInstance();
         Server server = Server.GetServer();
-        World world = World.GetWorld();
+        World World = World.GetWorld();
+        Util util = Util.GetUtil();
 
 
         public string StartMessage = "BattleRoyale has been started for {0} Minute(s)";
@@ -47,8 +48,18 @@ namespace BattleRoyale
         public override string Description { get { return "BattleRoyale"; } }
         public override Version Version { get { return new Version("1.0"); } }
 
-        private List<ulong> inroyale = new List<ulong>();
-        private List<ulong> inlobby = new List<ulong>();
+        public List<ulong> inroyale = new List<ulong>();
+        public List<ulong> inlobby = new List<ulong>();
+        public List<ulong> underadding = new List<ulong>();
+        public List<ulong> entitymode = new List<ulong>();
+
+        public Dictionary<string, string> entities = new Dictionary<string, string>()
+        {
+            { "WoodBoxLarge", ";deploy_wood_storage_large" },
+            {"WoodBox", ";deploy_wood_box" }
+
+        };
+
         public bool enabled = false;
 
 
@@ -57,9 +68,10 @@ namespace BattleRoyale
 
             LoadHooks();
             CheckConfig();
-            CheckLootList();
+           // CheckLootList();
             SendLobby();
             enabled = true;
+
         }
         void LoadHooks()
         {
@@ -69,7 +81,7 @@ namespace BattleRoyale
             Fougerite.Hooks.OnPlayerConnected += Connected;
             Fougerite.Hooks.OnPlayerDisconnected += Disconnect;
             Fougerite.Hooks.OnPlayerHurt += Hurt;
-
+            Fougerite.Hooks.OnServerInit += Init;
             Fougerite.Hooks.OnPlayerKilled += Killed;
             Fougerite.Hooks.OnPlayerSpawned += Spawned;
             Logger.Log("[BattleRoyale Beta 1] Hooks Loaded");
@@ -83,6 +95,18 @@ namespace BattleRoyale
             Fougerite.Hooks.OnPlayerKilled -= Killed;
             Fougerite.Hooks.OnPlayerSpawned -= Spawned;
             Fougerite.Hooks.OnPlayerHurt -= Hurt;
+            Fougerite.Hooks.OnServerInit -= Init;
+
+        }
+        void Init()
+        {
+            Logger.Log("************************************************************************************************************");
+            Logger.Log("[color #bcee68] BATTLE ROYALE 1 BETA by ice cold ");
+            Logger.Log("You spawn on the spawn point of the initial playable area with a torch, bandage and map at sunrise. Find loot as you make your way to the center of the map.");
+            Logger.Log("2: Loot spawns on random places around the map. Supply drops contain rare loot.");
+            Logger.Log("3: You are surviving. Continue moving across the map and remember do not get killed");
+            Logger.Log("************************************************************************************************************");
+            server.server_message_name = "BattleRoyale";
         }
         void CheckConfig()
         {
@@ -94,7 +118,7 @@ namespace BattleRoyale
                 ini.AddSetting("Options", "BattleTimer", BattleTimer.ToString());
                 ini.AddSetting("Options", "npcgod", npcgod.ToString());
                 ini.AddSetting("Options", "WaitTimer", WaitTimer.ToString());
-                ini.AddSetting("Options", "MinPlayers", MinPlayers.ToString());
+                ini.AddSetting("Options", "MinPlayers", MinPlayers.ToString());             
                 ini.AddSetting("Options", "BarricadePlus", BarricadePlus.ToString());
                 ini.AddSetting("Messages", "StartMessage", StartMessage.ToString());
                 ini.AddSetting("Messages", "DeathMessage", DeathMessage.ToString());
@@ -109,7 +133,10 @@ namespace BattleRoyale
                 ini.AddSetting("Messages", "LeaveMessage", LeaveMessage.ToString());
                 ini.AddSetting("Items", "Rock", "1");
                 ini.AddSetting("Items", "Torch", "1");
-                ini.AddSetting("Items", "Bandage", "1");       
+                ini.AddSetting("Items", "Bandage", "1");
+                ini.AddSetting("LootSpawn", "M4", "1");
+                ini.AddSetting("LootSpawn", "Large Medkit", "5");
+
                 ini.Save();
                 Logger.Log("[BattleRoyale Beta 1] File created");
             }
@@ -120,7 +147,7 @@ namespace BattleRoyale
                 BattleTimer = int.Parse(ini.GetSetting("Options", "BattleTimer"));
                 npcgod = bool.Parse(ini.GetSetting("Options", "npcgod"));
                 WaitTimer = int.Parse(ini.GetSetting("Options", "WaitTimer"));
-                MinPlayers = int.Parse(ini.GetSetting("Options", "MinPlayers"));
+                MinPlayers = int.Parse(ini.GetSetting("Options", "MinPlayers"));             
                 BarricadePlus = bool.Parse(ini.GetSetting("Options", "BarricadePlus"));
                 StartMessage = ini.GetSetting("Messages", "StartMessage");
                 DeathMessage = ini.GetSetting("Messages", "DeathMessage");
@@ -135,26 +162,8 @@ namespace BattleRoyale
                 LeaveMessage = ini.GetSetting("Messages", "LeaveMessage");
             }
 
-        }
-        void CheckLootList()
-        {
-            if (!File.Exists(Path.Combine(ModuleFolder, "lootlist")))
-            {
-                File.Create(Path.Combine(ModuleFolder, "lootlist.ini")).Dispose();
-                lootlist = new IniParser(Path.Combine(ModuleFolder, "lootlist.ini"));
-                lootlist.AddSetting("WeaponLootBox", "1", "(5797, 397, -3439)");
-                lootlist.AddSetting("MedicalLootBox", "1", "(5797, 397, -3439)");
-                lootlist.AddSetting("SupplyCrate", "1", "(5716, 406, -3400)");
-                lootlist.AddSetting("BoxLoot", "1", "(5716, 406, -3400)");
-                lootlist.AddSetting("AmmoLootBox", "1", "(6140, 383, -3429)");
-                lootlist.Save();
-            }
-            else
-            {
-                lootlist = new IniParser(Path.Combine(ModuleFolder, "lootlist.ini"));
-            }
-        }
-        void SendLobby()
+        }   
+        public void SendLobby()
         {
             server.BroadcastFrom("BattleRoyale", EndMessage);
             if (server.Players.Count() >= MinPlayers)
@@ -167,8 +176,9 @@ namespace BattleRoyale
                     if (inroyale.Contains(pl.UID)) { inroyale.Remove(pl.UID); }
                     if (!inlobby.Contains(pl.UID)) { inlobby.Add(pl.UID); }
                     Vector3 pos = (Vector3)ds.Get("LobbySpawn", "spawn");
-                    pl.TeleportTo(pos);                
+                    pl.TeleportTo(pos);
                     waittimer(WaitTimer * 1000, null).Start();
+                    CleanSacks();
                 }
             }
             else
@@ -176,7 +186,56 @@ namespace BattleRoyale
                 server.BroadcastFrom("BattleRoyale", NotEnoughPlayersMessage);
             }
         }
-        void Spawned(RoyaleUser pl, SpawnEvent se)
+        public void Deploy(RoyaleUser pl, Entity ent, RoyaleUser actualplacer)
+        {
+            if(entitymode.Contains(actualplacer.UID))
+            {
+                if(ent.Name.ToLower().Contains("box"))
+                {
+                    actualplacer.MessageFrom("battleRoyale", ent.Name + " Places");
+                }
+            }
+        }
+      /*  public void EntHurt(HurtEvent he)
+        {
+            // Dretax his way in Hungergames
+            Entity ent = he.Entity;
+            RoyaleUser attacker = (RoyaleUser)he.Attacker;
+            string gun = he.WeaponName;
+            if(attacker != null && ent != null && !he.IsDecay && he.AttackerIsPlayer)
+            {
+                ulong id = attacker.UID;
+
+                if(gun == "Shotgun")
+                {
+                    attacker.MessageFrom("BattleRoyale", "You cannot use shotgun in entity mode");
+                    return;
+                }
+                if(entitymode.Contains(id))
+                {
+                    if(ent.Name.ToLower().Contains("box"))
+                    {
+                        string[] c = lootlist.EnumSection("Chests");
+                        string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
+                        lootlist.AddSetting("Chests", ent.Name + "-" + co.ToString(), ent.X.ToString() + ", " + ent.Y.ToString() + ", " + ent.Z.ToString() + ", " + ent.Rotation.x.ToString() + "," + ent.Rotation.y.ToString() + "," + ent.Rotation.z.ToString() + "," + ent.Rotation.w.ToString());
+                        lootlist.Save();
+                        attacker.MessageFrom("BattleRoyale", "Chest added");
+                    }                  
+                }
+            }
+       */
+        private void CleanSacks()
+        {
+            foreach(LootableObject loot in UnityEngine.Resources.FindObjectsOfTypeAll<LootableObject>())
+            {
+                if(loot.gameObject.name == "LootSack(Clone)")
+                {
+                    NetCull.Destroy(loot.gameObject);
+                }
+            }
+        }
+         
+        public void Spawned(RoyaleUser pl, SpawnEvent se)
         {
             if (!inlobby.Contains(pl.UID))
             {
@@ -190,17 +249,17 @@ namespace BattleRoyale
 
             }
         }
-        void Connected(RoyaleUser pl)
+        public void Connected(RoyaleUser pl)
         {
             string msg = JoinMessage.Replace("{0}", pl.Name);
             server.BroadcastFrom("BattleRoyale", msg);
         }
-        void Disconnect(RoyaleUser pl)
+        public void Disconnect(RoyaleUser pl)
         {
             string msg = LeaveMessage.Replace("{0}", pl.Name);
             server.BroadcastFrom("BattleRoyale", msg);
         }
-        void Killed(DeathEvent de)
+        public void Killed(DeathEvent de)
         {
             if (de.AttackerIsPlayer && de.VictimIsPlayer)
             {
@@ -221,7 +280,7 @@ namespace BattleRoyale
                 }
             }
         }
-        void Hurt(HurtEvent he)
+        public void Hurt(HurtEvent he)
         {
             if (he.AttackerIsNPC && he.VictimIsPlayer)
             {
@@ -240,29 +299,9 @@ namespace BattleRoyale
                     he.DamageAmount = 0f;
                     return;
                 }
-            }
+            }  
         }
-        void Deploy(RoyaleUser pl, Fougerite.Entity ent, RoyaleUser actualplacer)
-        {
-            if (ent != null)
-            {
-                if (BarricadePlus)
-                {
-                    if (ent.Name == "Wood Barricade")
-                    {
-                        ds.Add("barloc", "loc", ent.Location);
-                        Vector3 loc = (Vector3)ds.Get("barloc", "loc");
-                        ent.Destroy();
-                        world.Spawn(";struct_wood_wall", loc);
-                    }
-                }
-            }
-            else if (inlobby.Contains(actualplacer.UID))
-            {
-                ent.Destroy();
-            }
-        }
-        void Command(RoyaleUser pl, string cmd, string[] args)
+        public void Command(RoyaleUser pl, string cmd, string[] args)
         {
             if (cmd == "battleroyale")
             {
@@ -278,11 +317,12 @@ namespace BattleRoyale
                     pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/battle_on = enables plugin");
                     pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/battle_addlobby = adds the spawn for lobby (required)");
                     pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/battle_addspawn = adds the spawn for battle (required)");
-                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box1 = adds location for weaponbox");
-                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box2 = adds location for medicalbox");
-                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box3 = adds location for junkbox");
-                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box4 = adds location for SupplyCrate");
-                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box5 = adds location for AmmoBox");
+                    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/battle_entity = Turns on/off entity mode");
+                    //   pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box1 = adds location for weaponbox");
+                    //   pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box2 = adds location for medicalbox");
+                    //   pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box3 = adds location for junkbox");
+                    //    pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box4 = adds location for SupplyCrate");
+                    //   pl.MessageFrom("BattleRoyale", "[color #a4d3ee]/spawn_box5 = adds location for AmmoBox");
                 }
             }
             else if (cmd == "battle_restarts")
@@ -298,12 +338,28 @@ namespace BattleRoyale
                             inlobby.Add(player.UID);
                             player.TeleportTo(lobby);
                             //testing if kit works 
-                          //  GiveLoadout(pl);
+                            //  GiveLoadout(pl);
                         }
                         else
                         {
                             pl.MessageFrom("ERROR", "[color red]Please make a lobby");
                         }
+                    }
+                }
+            }
+            else if (cmd == "battle_entity")
+            {
+                if (pl.Admin)
+                {
+                    if (entitymode.Contains(pl.UID))
+                    {
+                        entitymode.Remove(pl.UID);
+                        pl.MessageFrom("BattleRoyale", "EntityMode disabled");
+                    }
+                    else
+                    {
+                        entitymode.Add(pl.UID);
+                        pl.MessageFrom("BattleRoyale", "Entitymode enabled hit a box to add it");
                     }
                 }
             }
@@ -325,69 +381,13 @@ namespace BattleRoyale
                     pl.MessageFrom("BattleRoyale", "Master spawn has been added");
                 }
             }
-            else if (cmd == "spawn_box1")
-            {
-                if (pl.Admin)
-                {
-                    string[] c = lootlist.EnumSection("WeaponLootBox");
-                    string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
-                    lootlist.AddSetting("WeaponLootBox", co, pl.Location.ToString());
-                    lootlist.Save();
-                    pl.MessageFrom("BattleRoyale", "Added");
-                }
-
-            }
-            else if (cmd == "spawn_box2")
-            {
-                if (pl.Admin)
-                {
-                    string[] c = lootlist.EnumSection("MedicalLootBox");
-                    string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
-                    lootlist.AddSetting("MedicalLootBox", co.ToString(), pl.Location.ToString());
-                    lootlist.Save();
-                    pl.MessageFrom("BattleRoyale", "Added");
-                }
-
-            }
-            else if (cmd == "spawn_box3")
-            {
-                if (pl.Admin)
-                {
-                    string[] c = lootlist.EnumSection("SupplyCrate");
-                    string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
-                    lootlist.AddSetting("SupplyCrate", co.ToString(), pl.Location.ToString());
-                    lootlist.Save();
-                    pl.MessageFrom("BattleRoyale", "Added");
-                }
-            }
-            else if (cmd == "spawn_box4")
-            {
-                if (pl.Admin)
-                {
-                    string[] c = lootlist.EnumSection("BoxLoot");
-                    string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
-                    lootlist.AddSetting("BoxLoot", co.ToString(), pl.Location.ToString());
-                    lootlist.Save();
-                    pl.MessageFrom("BattleRoyale", "Added");
-                }
-            }
-            else if (cmd == "spawn_box5")
-            {
-                if (pl.Admin)
-                {
-                    string[] c = lootlist.EnumSection("AmmoLootBox");
-                    string co = (Convert.ToInt32(c[c.Length - 1]) + 1).ToString();
-                    lootlist.AddSetting("AmmoLootBox", co.ToString(), pl.Location.ToString());
-                    lootlist.Save();
-                    pl.MessageFrom("BattleRoyale", "Added");
-                }
-            }
         }
-        void GiveLoadout(RoyaleUser pl)
+       
+        public void GiveLoadout(RoyaleUser pl)
         {
             string[] en = ini.EnumSection("Items");
-            foreach(var item in en)
-            {                  
+            foreach (var item in en)
+            {
                 int hi = Convert.ToInt32(ini.GetSetting("Items", item));
                 int amount = hi;
                 pl.Inventory.AddItem(item, amount);
@@ -405,7 +405,7 @@ namespace BattleRoyale
         {
             var dict = e.Args;
             e.Kill();
-            foreach(RoyaleUser pl in server.Players)
+            foreach (RoyaleUser pl in server.Players)
             {
                 if (inlobby.Contains(pl.UID))
                 {
@@ -413,18 +413,18 @@ namespace BattleRoyale
                     Vector3 pos = (Vector3)ds.Get("BattleSpawn", "spawn");
                     GiveLoadout(pl);
                     pl.TeleportTo(pos);
-                    string time = Convert.ToString(WaitTimer);
+                    string time = Convert.ToString(BattleTimer);
                     string message = StartMessage.Replace("{0}", time);
                     string notice = StartNotice.Replace("{0}", time);
                     pl.MessageFrom("battleRoyale", message);
                     inlobby.Remove(pl.UID);
                     inroyale.Add(pl.UID);
-                    pl.Notice(notice);                
-                }             
+                    pl.Notice(notice);
+                }
             }
-            SpawnLoot();
+        //    SpawnBox();
             battletimer(BattleTimer * 60000, null).Start();
-        }
+        }   
         public TimedEvent battletimer(int timeoutDelay, Dictionary<string, object> args)
         {
             TimedEvent timedEvent = new TimedEvent(timeoutDelay);
@@ -448,18 +448,39 @@ namespace BattleRoyale
                     pl.TeleportTo(pos);
                 }
             }
+            SpawnLoot();
             StartWaitTimer();
-            
         }
-        void StartWaitTimer()
+        public void StartWaitTimer()
         {
-            if(server.Players.Count() >= MinPlayers)
+            if (server.Players.Count() >= MinPlayers)
             {
                 string timer = Convert.ToString(WaitTimer);
                 string msg = WaitMessage.Replace("{0}", timer);
                 server.BroadcastFrom("BattleRoyale", msg);
                 waittimer(WaitTimer * 1000, null).Start();
-            }        
+            }
+            else
+            {
+                server.BroadcastFrom("BattleRoyale", NotEnoughPlayersMessage);
+            }
+        }
+        public void SpawnLoot()
+        {
+            foreach(var x in World.DeployableObjects())
+            {
+                if(x.Name.ToLower().Contains("box"))
+                {
+                    x.Inventory.ClearAll();
+                    foreach(var loot in ini.EnumSection("LootSpawn"))
+                    {
+                        int amount = (Convert.ToInt32(ini.GetSetting("LootSpawn", loot)));
+                        x.Inventory.AddItem(loot, amount);
+                        x.Health += 100;
+                    }
+                }
+            }
         }
     }
 }
+  
