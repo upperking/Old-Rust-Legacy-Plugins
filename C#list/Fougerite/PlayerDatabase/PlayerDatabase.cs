@@ -108,7 +108,7 @@ namespace PlayerDatabase
         {
             if(pl != null)
             {
-                if(list.GetSetting(pl.SteamID, "IsAdmin") == "yes")
+                if(list.GetSetting(pl.SteamID, "IsAdmin") == "true")
                 {
                     return true;
                 }
