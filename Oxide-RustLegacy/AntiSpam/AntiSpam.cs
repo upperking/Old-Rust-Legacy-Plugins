@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,6 +62,14 @@ namespace Oxide.Plugins
                         {
                             rust.Notice(all, netuser.displayName + " has been auto kicked for spamming");
                         }
+                    }
+                }
+                else
+                {
+                    Cooldown[netuser.userID] = TimeSpan.FromTicks(DateTime.Now.Ticks).TotalSeconds;
+                    if(Detections.ContainsKey(netuser.userID))
+                    {
+                        Detections.Remove(netuser.userID);
                     }
                 }
             }
