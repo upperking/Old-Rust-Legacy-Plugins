@@ -2,7 +2,7 @@
  function On_Command(Player, cmd, args){
  	if(cmd == "tester")
  	{
- 		if(API.HasFlag(Player, "testerflag"))
+ 		if(FlagsAPI.flag.HasFlag(Player, "testerflag"))
  		{
  			Player.Notice("Yes");
  		}
