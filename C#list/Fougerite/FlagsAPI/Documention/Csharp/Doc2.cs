@@ -1,7 +1,7 @@
 // some example methods
-FlagsAPI.API.HasFlag(Player, "flagname")
-FlagsAPI.API.RemoveFlag(Player, "flagname");
-FlagsAPI.API.RegisterFlag("flagname");
-FlagsAPI.API.RemoveFlag("flagname");
-FlagsAPI.API.GetFlag(Player, "flagname");
+flag.HasFlag(Player, "flagname")
+flag.RemoveFlag(Player, "flagname");
+flag.RegisterFlag("flagname");
+flag.RemoveFlag("flagname");
+flag.GetFlag(Player, "flagname");
 
