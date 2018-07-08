@@ -27,7 +27,7 @@ namespace TestFlags
         {
             if (cmd == "test")
             {
-                if (flag.HasFlag(pl, "testflag"))
+                if (!flag.HasFlag(pl, "testflag"))
                 {
                    flag.RegisterFlag("test2");              
                 }
