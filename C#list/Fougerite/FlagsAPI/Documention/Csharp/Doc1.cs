@@ -27,9 +27,9 @@ namespace TestFlags
         {
             if (cmd == "test")
             {
-                if (FlagsAPI.API.HasFlag(pl, "testflag"))
+                if (flag.HasFlag(pl, "testflag"))
                 {
-                   FlagsAPI.API.RegisterFlag("test2");              
+                   flag.RegisterFlag("test2");              
                 }
                 else
                 {
@@ -38,15 +38,15 @@ namespace TestFlags
             }
             else if(cmd == "test2")
             {
-                if(FlagsAPI.API.HasFlag(pl, "testflag"))
+                if(flag.HasFlag(pl, "testflag"))
                 {
-                    FlagsAPI.API.RemoveFlag("test2");
+                    flag.RemoveFlag("test2");
                 }
             }
             else if(cmd == "getflag")
             {
                 Player target = Server.GetServer().FindPlayer(args[0]);
-                pl.MessageFrom(Name, target.Name + " has " + FlagsAPI.API.GetFlag(target, args[1]));
+                pl.MessageFrom(Name, target.Name + " has " + flag.GetFlag(target, args[1]));
             }
         }
     }
