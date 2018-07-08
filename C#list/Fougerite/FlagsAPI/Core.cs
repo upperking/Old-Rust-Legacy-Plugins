@@ -18,12 +18,9 @@ namespace FlagsAPI
         public override string Description { get { return "FlagsAPI aka Permissions System"; } }
         public override Version Version { get { return new Version("1.2"); } }
 
-        public static Dictionary<string, string> userflag;
-
 
         public override void Initialize()
         {
-            userflag = new Dictionary<string, string>();
             Fougerite.Hooks.OnCommand += Command;
 
 
