@@ -11,7 +11,7 @@ import FlagsAPI
 class Example:
     def On_Command(self, Player, cmd, args):
         if cmd == "tester":
-            if API.HasFlag(Player, "testflager"):
+            if FlagsAPI.flag.HasFlag(Player, "testflager"):
                 Player.Notice("yes")
             else:
                 Player.Notice("no")
