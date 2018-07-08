@@ -15,16 +15,19 @@ namespace FlagsAPI
 
         public override string Name { get { return "FlagsAPI"; } }
         public override string Author { get { return "ice cold"; } }
-        public override string Description { get { return "Manage flags on players"; } }
-        public override Version Version { get { return new Version("1.1"); } }
+        public override string Description { get { return "FlagsAPI aka Permissions System"; } }
+        public override Version Version { get { return new Version("1.2"); } }
+
+        public static Dictionary<string, string> userflag;
 
 
         public override void Initialize()
         {
+            userflag = new Dictionary<string, string>();
             Fougerite.Hooks.OnCommand += Command;
-          
 
-            if(!File.Exists(Path.Combine(ModuleFolder, "PlayerFlagdb.ini")))
+
+            if (!File.Exists(Path.Combine(ModuleFolder, "PlayerFlagdb.ini")))
             {
                 File.Create(Path.Combine(ModuleFolder, "PlayerFlagdb.ini")).Dispose();
                 ini = new IniParser(Path.Combine(ModuleFolder, "PlayerFlagdb.ini"));
@@ -34,7 +37,7 @@ namespace FlagsAPI
             {
                 ini = new IniParser(Path.Combine(ModuleFolder, "PlayerFlagdb.ini"));
             }
-            if(!File.Exists(Path.Combine(ModuleFolder, "Flags.list")))
+            if (!File.Exists(Path.Combine(ModuleFolder, "Flags.list")))
             {
                 File.Create(Path.Combine(ModuleFolder, "Flags.list")).Dispose();
                 list = new IniParser(Path.Combine(ModuleFolder, "Flags.list"));
@@ -53,7 +56,7 @@ namespace FlagsAPI
         {
             if (cmd == "flag")
             {
-                if (pl.Admin || API.HasFlag(pl, "canflag"))
+                if (pl.Admin || flag.HasFlag(pl, "canflag"))
                 {
                     pl.Notice("⚑", "FlagsAPI brought by ice cold", 20f);
                     pl.MessageFrom(Name, "FlagsAPI 1.1 by ice cold");
@@ -68,14 +71,14 @@ namespace FlagsAPI
             }
             else if (cmd == "flag_add")
             {
-                if(pl.Admin || API.HasFlag(pl, "canflag"))
+                if (pl.Admin || flag.HasFlag(pl, "canflag"))
                 {
                     if (args.Length != 2)
                     {
                         pl.Notice("⚑", "Syntax /flag_add PlayerName FlagName");
                         return;
                     }
-                    if(list.ContainsSetting("Flags", args[1]))
+                    if (list.ContainsSetting("Flags", args[1]))
                     {
                         var user = Fougerite.Server.GetServer().FindPlayer(args[0]);
                         if (user == null) { pl.Notice("⚑", "Failed to find user"); return; }
@@ -88,11 +91,11 @@ namespace FlagsAPI
                     {
                         pl.MessageFrom(Name, "You must register this flag first by doing /flag_register " + args[1]);
                     }
-                }         
+                }
             }
             else if (cmd == "flag_invoke")
             {
-                if(pl.Admin || API.HasFlag(pl, "canflag"))
+                if (pl.Admin || flag.HasFlag(pl, "canflag"))
                 {
                     if (args.Length != 2)
                     {
@@ -113,23 +116,23 @@ namespace FlagsAPI
                     }
                 }
             }
-            else if(cmd == "flags_reload")
+            else if (cmd == "flags_reload")
             {
-                if(pl.Admin || API.HasFlag(pl, "canflag"))
+                if (pl.Admin || flag.HasFlag(pl, "canflag"))
                 {
                     ini = new IniParser(Path.Combine(ModuleFolder, "PlayerFlagdb.ini"));
                     list = new IniParser(Path.Combine(ModuleFolder, "Flags.list"));
                     pl.Notice("Flags database reloaded");
                 }
             }
-            else if(cmd == "flag_register")
+            else if (cmd == "flag_register")
             {
-                if(pl.Admin || API.HasFlag(pl, "canflag"))
+                if (pl.Admin || flag.HasFlag(pl, "canflag"))
                 {
-                    API.RegisterFlag(args[0]);
+                    flag.RegisterFlag(args[0]);
                     pl.MessageFrom(Name, "The flag (" + args[0] + ") was succestfully registered");
                 }
             }
-        }     
+        }
     }
 }
