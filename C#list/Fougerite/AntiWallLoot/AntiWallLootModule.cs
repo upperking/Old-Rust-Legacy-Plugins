@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,9 +49,20 @@ namespace AntiWallLoot
             if (looter == null) return;
             if(IsWallooting(e.Player, e.Inventory))
             {
-                e.Cancel();
+                Notify(looter, e.Inventory);
                 Server.GetServer().BroadcastFrom(Name, "[color red]" + looter.Name + "[color red] has been kicked for wallooting");
-                looter.Disconnect();           
+                looter.Disconnect();               
+            }
+        }
+
+        private void Notify(User looter, Inventory inv)
+        {
+            foreach (var pl in Server.GetServer().Players)
+            {
+                if (pl.Admin || pl.Moderator)
+                {
+                    pl.MessageFrom(Name, string.Format("{0} - Walloot @ {1}", looter.Name, looter.Location));
+                }
             }
         }
 
