@@ -30,6 +30,9 @@ namespace Teleporter
         {
             U.Events.OnPlayerDisconnected -= Disconnect;
             instance = null;
+            Requested = null;
+            Incomming = null;
+            Cooldown = null;
         }
 
         public void Disconnect(UnturnedPlayer player)
