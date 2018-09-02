@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +29,7 @@ namespace Teleporter
         protected override void Unload()
         {
             U.Events.OnPlayerDisconnected -= Disconnect;
+            instance = null;
         }
 
         public void Disconnect(UnturnedPlayer player)
