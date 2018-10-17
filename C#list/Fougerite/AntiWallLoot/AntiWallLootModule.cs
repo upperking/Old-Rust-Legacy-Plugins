@@ -15,7 +15,7 @@ namespace AntiWallLoot
         public override string Name { get { return "AntiWallLoot"; } }
         public override string Author { get { return "ice cold"; } }
         public override string Description { get { return "Blocks Wallooting"; } }
-        public override Version Version { get { return new Version("1.0"); } }
+        public override Version Version { get { return new Version("1.1"); } }
         public static RaycastHit cachedRaycast;
         public static string cachedModelname;
         public static string cachedObjectname;
@@ -49,8 +49,10 @@ namespace AntiWallLoot
             if (looter == null) return;
             if(IsWallooting(e.Player, e.Inventory))
             {
+                ItemDataBlock block = DatablockDictionary.GetByName(e.ItemName);
+                e.Inventory.AddItemAmount(block, 1);
                 Notify(looter, e.Inventory);
-                Server.GetServer().BroadcastFrom(Name, "[color red]" + looter.Name + "[color red] has been kicked for wallooting");
+                Server.GetServer().BroadcastFrom(Name, "[color red]" + looter.Name + "[color red] has been kicked for WallLooting");
                 looter.Disconnect();               
             }
         }
@@ -61,7 +63,7 @@ namespace AntiWallLoot
             {
                 if (pl.Admin || pl.Moderator)
                 {
-                    pl.MessageFrom(Name, string.Format("{0} - Walloot @ {1}", looter.Name, looter.Location));
+                    pl.MessageFrom(Name, string.Format("{0} - WallLoot @ {1}", looter.Name, looter.Location));
                 }
             }
         }
