@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Fougerite;
 using Fougerite.Events;
+using RustPP;
 using UnityEngine;
 using System.Reflection;
 using User = Fougerite.Player;
@@ -14,7 +15,7 @@ namespace AntiWallLoot
     {
         public override string Name { get { return "AntiWallLoot"; } }
         public override string Author { get { return "ice cold"; } }
-        public override string Description { get { return "Blocks Wallooting"; } }
+        public override string Description { get { return "Blocks Wall looting"; } }
         public override Version Version { get { return new Version("1.1"); } }
         public static RaycastHit cachedRaycast;
         public static string cachedModelname;
@@ -52,7 +53,7 @@ namespace AntiWallLoot
                 ItemDataBlock block = DatablockDictionary.GetByName(e.ItemName);
                 e.Inventory.AddItemAmount(block, 1);
                 Notify(looter, e.Inventory);
-                Server.GetServer().BroadcastFrom(Name, "[color red]" + looter.Name + "[color red] has been kicked for WallLooting");
+                Server.GetServer().BroadcastFrom(Core.Name, "[color yellow]☢ [color red]Player: [color yellow]" + looter.Name + "[color red] has been kicked for wall looting.");
                 looter.Disconnect();               
             }
         }
@@ -63,7 +64,7 @@ namespace AntiWallLoot
             {
                 if (pl.Admin || pl.Moderator)
                 {
-                    pl.MessageFrom(Name, string.Format("{0} - WallLoot @ {1}", looter.Name, looter.Location));
+                    pl.MessageFrom(Core.Name, string.Format("☢ [color cyan]{0} [color white]- Wall loot @ {1}", looter.Name, looter.Location));
                 }
             }
         }
