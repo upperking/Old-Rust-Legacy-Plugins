@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustEssentials", "RustEssentials\RustEssentials.csproj", "{17601B7A-F297-4461-A1F8-5E903EF18E00}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17601B7A-F297-4461-A1F8-5E903EF18E00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17601B7A-F297-4461-A1F8-5E903EF18E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17601B7A-F297-4461-A1F8-5E903EF18E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17601B7A-F297-4461-A1F8-5E903EF18E00}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FA133600-A925-495E-A180-D4DA1E4904A9}
+	EndGlobalSection
+EndGlobal
