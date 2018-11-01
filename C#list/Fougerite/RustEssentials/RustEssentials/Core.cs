@@ -29,10 +29,18 @@ namespace RustEssentials
             Fougerite.Hooks.OnCommand += Command;
             Fougerite.Hooks.OnPluginInit += PluginInit;
             Fougerite.Hooks.OnSteamDeny += Deny;
+            Fougerite.Hooks.OnResourceSpawned += ResourceSpawn;
+        }
+
+        private void ResourceSpawn(ResourceTarget resource)
+        {
+            // Calls the resource hook at Gather.cs
+            RustEssentials.Plugins.Gather.ResourceNode(resource);
         }
 
         private void Connected(User player)
         {
+            CheckForPlayerData(player);
             if(!playerlist.Contains(player))
             {
                 playerlist.Add(player);
@@ -52,6 +60,10 @@ namespace RustEssentials
                 if(sde.Reason == "Facepunch_Connector_Cancelled")
                 {
                     sde.ForceAllow = true;
+                }
+                else if(sde.Reason == "Denying entry to " + sde.NetUser.userID + " because they're already connected")
+                {
+                    sde.NetUser.Kick(NetError.Facepunch_Kick_Violation, true);
                 }
             }
         }
@@ -77,6 +89,10 @@ namespace RustEssentials
                     {
                         RustEssentials.Plugins.TPR.ExecuteTPA(netuser, args);
                         break;
+                    }
+                case "warps":
+                    {
+
                     }
             }
 

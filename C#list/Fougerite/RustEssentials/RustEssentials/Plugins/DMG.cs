@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RustEssentials.Plugins
 {
-    class DMG
+    public class DMG
     {
     }
 }

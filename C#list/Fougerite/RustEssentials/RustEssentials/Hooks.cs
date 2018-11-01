@@ -18,13 +18,19 @@ namespace RustEssentials
             arg = Facepunch.Utility.String.SplitQuotesStrings(args);
             return arg.ToString();
         }
-        public static PlayerInventory GetInventory(NetUser netuser)
+        public static void GiveItem(NetUser netuser, string itemname, int amount)
+        {
+            if (netuser != null)
+            {
+                Fougerite.Server.Cache[netuser.userID].Inventory.AddItem(itemname, amount);
+            }
+        }
+        public static void GiveitemTo(NetUser netuser, string itemname, int amount, int slot)
         {
             if(netuser != null)
             {
-                return netuser.playerClient.rootControllable.GetComponent<PlayerInventory>();
+                Fougerite.Server.Cache[netuser.userID].Inventory.AddItemTo(itemname, slot, amount);
             }
-            return null;
         }
         public static void TeleportPlayerToPlayer(NetUser netuser, NetUser target)
         {

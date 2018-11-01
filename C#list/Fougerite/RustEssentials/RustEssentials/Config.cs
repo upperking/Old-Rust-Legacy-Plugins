@@ -13,7 +13,8 @@ namespace RustEssentials
             {"SaveTime", "10" },
             {"SystemColor", "[color #76ee00]" },
             {"NoAccess", "You dont have acces to this command" },
-            {"AllowCracked", "true" }
+            {"AllowCracked", "true" },
+            {"FixAlreadyConnectedBug", "true" }
         };
         public static Dictionary<string, string> warp = new Dictionary<string, string>()
         {
@@ -27,6 +28,15 @@ namespace RustEssentials
             {"WarpSet", "Warp {0} saved at {1}"},
             {"WarpRemove", "Warp {0} removed" }
         };
+        public static Dictionary<string, string> GatherMultiplier = new Dictionary<string, string>()
+        {
+            {"EnableGatherMultiplier", "true" },
+            {"Metal Ore", RustEssentials.Plugins.Gather.GathermetalOreMultiplier.ToString() },
+            {"Stone Ore", RustEssentials.Plugins.Gather.GatherstonesMultiplier.ToString() },
+            {"Sulfur Ore", RustEssentials.Plugins.Gather.GathersulfurOreMultiplier.ToString() },
+            {"WoodPile", RustEssentials.Plugins.Gather.GatherwoodpileMultiplier.ToString() }
+        };
+
 
     }
 }

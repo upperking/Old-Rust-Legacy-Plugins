@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RustEssentials.Plugins
 {
-    class Addfriend
+    public class Addfriend
     {
     }
 }

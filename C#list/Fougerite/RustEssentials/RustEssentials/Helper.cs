@@ -8,6 +8,7 @@ namespace RustEssentials
 {
     public class Helper
     {
+
         public static void Log(string message)
         {
             Fougerite.Logger.Log(message);
@@ -18,7 +19,9 @@ namespace RustEssentials
         }
         public static void LogWarning(string message)
         {
-            Fougerite.Logger.LogWarning(message);
+            Fougerite.Logger.LogWarning(message);         
         }
+
+       
     }
 }

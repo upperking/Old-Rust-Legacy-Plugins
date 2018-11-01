@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RustEssentials.Plugins
 {
-    class Share
+    public class Share
     {
     }
 }

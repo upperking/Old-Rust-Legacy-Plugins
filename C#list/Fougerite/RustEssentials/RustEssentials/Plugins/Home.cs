@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace RustEssentials.Plugins
 {
-    class Home
+    public class Home
     {
     }
 }

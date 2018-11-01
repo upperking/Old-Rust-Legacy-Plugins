@@ -59,8 +59,19 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Hooks.cs" />
+    <Compile Include="Plugins\Addfriend.cs" />
+    <Compile Include="Plugins\Anticheat.cs" />
+    <Compile Include="Plugins\Death.cs" />
+    <Compile Include="Plugins\DMG.cs" />
+    <Compile Include="Plugins\Gather.cs" />
+    <Compile Include="Plugins\Home.cs" />
+    <Compile Include="Plugins\Remover.cs" />
+    <Compile Include="Plugins\Share.cs" />
+    <Compile Include="Plugins\Stats.cs" />
     <Compile Include="Plugins\TPR.cs" />
+    <Compile Include="Plugins\Warps.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

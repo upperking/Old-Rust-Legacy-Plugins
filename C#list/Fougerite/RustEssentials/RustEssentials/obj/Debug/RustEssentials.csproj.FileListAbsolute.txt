@@ -1,0 +1,2 @@
+D:\VisualStudio projects\Fougerite\RustEssentials\RustEssentials\obj\Debug\RustEssentials.csprojAssemblyReference.cache
+D:\VisualStudio projects\Fougerite\RustEssentials\RustEssentials\obj\Debug\RustEssentials.csproj.CoreCompileInputs.cache

@@ -38,6 +38,7 @@ namespace RustEssentials.Plugins
                 if (calc < TprCooldown)
                 {
                     Hooks.SendMessage(netuser.userID, "Cooldown Time " + (Math.Round(calc)) + " | " + TprCooldown + " Seconds");
+                    Hooks.SendMessage(netuser.userID,  )
                     return;
                 }
             }
@@ -46,8 +47,8 @@ namespace RustEssentials.Plugins
 
         }
         public static void ExecuteTPA(NetUser netuser, string[] args)
-        {
-
+        {           
+            Helper.timer.Once()
         }
     }
 }
