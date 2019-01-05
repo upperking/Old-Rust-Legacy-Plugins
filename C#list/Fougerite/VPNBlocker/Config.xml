@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--VPNBlocker Configuration-->
+<Configuration>
+  <bool iphub="False" />
+  <string iphubkey="X-Key: KEY HERE" />
+</Configuration>
