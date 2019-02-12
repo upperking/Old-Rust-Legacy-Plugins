@@ -27,7 +27,6 @@ namespace EnhancedBanSystem
 
         public override void Initialize()
         {      
-         //   Hooks.OnServerShutdown += OnShutDown;
             Hooks.OnPlayerApproval += OnPlayerApproval;
             Hooks.OnCommand += OnCommand;
             Hooks.OnServerLoaded += OnServerLoaded;
